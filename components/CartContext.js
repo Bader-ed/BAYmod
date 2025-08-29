@@ -6,7 +6,7 @@ export function CartContextProvider({children}) {
   const ls = typeof window !== "undefined" ? window.localStorage : null;
   const [cartProducts,setCartProducts] = useState([]);
   useEffect(() => {
-    if (cartProducts?.length > 0) {
+    if (ls) {
       ls?.setItem('cart', JSON.stringify(cartProducts));
     }
   }, [cartProducts]);
