@@ -21,6 +21,10 @@ const WhiteBox = styled(Link)`
         max-width: 100%;
         max-height: 80px;
     }
+    &:hover{
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
 `;
 
 const Title = styled(Link)`

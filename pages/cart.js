@@ -66,6 +66,23 @@ const CityHolder = styled.div`
   gap: 5px;
 `;
 
+const TitleAndClearButton = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ClearButton = styled.button`
+  background-color: transparent;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  font-size: 1rem;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 export default function CartPage() {
   const {cartProducts,addProduct,removeProduct,clearCart} = useContext(CartContext);
   const [products,setProducts] = useState([]);
@@ -137,7 +154,14 @@ export default function CartPage() {
       <Center>
         <ColumnsWrapper>
           <Box>
-            <h2>Cart</h2>
+            <TitleAndClearButton>
+              <h2>Cart</h2>
+              {cartProducts.length > 0 && (
+                <ClearButton onClick={clearCart}>
+                  <h2>Clear Cart</h2>
+                </ClearButton>
+              )}
+            </TitleAndClearButton>
             {!cartProducts?.length && (
               <div>Your cart is empty</div>
             )}
@@ -218,7 +242,7 @@ export default function CartPage() {
                      name="country"
                      onChange={ev => setCountry(ev.target.value)}/>
               <Button black block
-                      onClick={goToPayment}>
+                       onClick={goToPayment}>
                 Continue to payment
               </Button>
             </Box>
