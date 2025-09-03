@@ -4,12 +4,13 @@ import Center from "@/components/Center";
 import { useContext, useState } from "react";
 import { CartContext } from "./CartContext";
 import BarsIcon from "./icons/Bars";
+import XmarkIcon from "./icons/XmarkIcon"; // Import the new icon
 import { useSession, signIn } from "next-auth/react"
 
 const StyledHeader = styled.header`
     background-color: #222;
-
 `;
+
 const Logo = styled(Link)`
     color: #fff;
     text-decoration:none;
@@ -40,12 +41,6 @@ const Wrapper = styled.div`
 `;
 
 const StyledNav = styled.nav`
-    ${props => props.$mobileNavActive ? `
-        display: block;
-    ` : `
-        display: none;
-    `}
-    gap: 15px;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -53,10 +48,26 @@ const StyledNav = styled.nav`
     right: 0;
     padding: 70px 20px 20px;
     background-color: #222;
+    transition: transform .3s ease-in-out, opacity .3s ease-in-out;
+    ${props => props.$mobileNavActive ? `
+        transform: translateX(0);
+        opacity: 1;
+    ` : `
+        transform: translateX(-100%);
+        opacity: 0;
+    `}
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    
     @media screen and (min-width: 768px) {
         display: flex;
+        flex-direction: row;
         position: static;
         padding: 0;
+        transform: translateX(0);
+        opacity: 1;
+        gap: 15px;
     }
 `;
 
@@ -106,7 +117,7 @@ export default function Header () {
                     )}
                 </StyledNav>
                 <NavButton onClick={() => setMobileNavActive(prev => !prev)}>
-                    <BarsIcon/>
+                    {mobileNavActive ? <XmarkIcon /> : <BarsIcon />}
                 </NavButton>
             </Wrapper>
         </Center>
