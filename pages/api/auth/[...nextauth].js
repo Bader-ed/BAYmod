@@ -3,15 +3,10 @@ import GoogleProvider from 'next-auth/providers/google';
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import { mongooseConnect } from "@/lib/mongoose";
 import mongoose from 'mongoose';
-import { Client } from "@/models/Client"; // Import your custom Client model
-import { User } from '@/models/User'; // NextAuth's default User model
+import { Client } from "@/models/Client";
 
-// Ensure the Google client ID and secret are available
-if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-  throw new Error('GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables are not set.');
-}
-
-export default NextAuth({
+export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -24,28 +19,35 @@ export default NextAuth({
       return mongoose.connection.getClient();
     })()
   ),
+  session: {
+    strategy: 'database',
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.client-session-token`,   // 👈 unique cookie name for client
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   callbacks: {
-    async signIn({ user, account, profile }) {
-      // Check if a client with this email already exists in your custom collection
+    async signIn({ user }) {
       const existingClient = await Client.findOne({ email: user.email });
-
       if (!existingClient) {
-        // If not, create a new client document in your custom collection
-        try {
-          await Client.create({
-            name: user.name,
-            email: user.email,
-            image: user.image,
-          });
-          console.log(`New client created for email: ${user.email}`);
-        } catch (error) {
-          console.error("Failed to create new client:", error);
-          return false; // Prevent sign-in on error
-        }
+        await Client.create({
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        });
       }
-
-      // Return true to allow the sign-in process to complete.
       return true;
     },
   },
-});
+};
+
+export default NextAuth(authOptions);

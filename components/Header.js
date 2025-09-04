@@ -1,14 +1,16 @@
 import Link from "next/link";
 import styled from "styled-components";
 import Center from "@/components/Center";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { CartContext } from "./CartContext";
 import BarsIcon from "./icons/Bars";
 import XmarkIcon from "./icons/XmarkIcon";
+import NotificationsIcon from "./icons/Notifications";
 import { useSession, signIn } from "next-auth/react";
 import Input from "./Input";
 import Button from "./Button";
 import { useRouter } from "next/router";
+import api from "@/lib/axios";
 
 const StyledHeader = styled.header`
     background-color: #222;
@@ -72,6 +74,7 @@ const StyledNav = styled.nav`
         transform: translateX(0);
         opacity: 1;
         gap: 15px;
+        align-items: center;
     }
 `;
 
@@ -80,6 +83,8 @@ const NavLink = styled(Link)`
     color: #aaa;
     text-decoration: none;
     padding: 10px 0;
+    position: relative;
+    
     @media screen and (min-width: 768px) {
         padding: 0;
     }
@@ -100,27 +105,14 @@ const NavButton = styled.button`
 `;
 
 const SearchContainer = styled.form`
-    display: flex;
+    display: none;
     background-color: #333;
     border-radius: 25px;
     overflow: hidden;
     gap: 0;
     align-items: center;
-    @media screen and (max-width: 767px) {
-        display: none;
-    }
-`;
-
-const MobileSearchContainer = styled.form`
-    display: flex;
-    gap: 0;
-    align-items: center;
-    padding: 10px 0;
-    background-color: #333;
-    border-radius: 25px;
-    overflow: hidden;
     @media screen and (min-width: 768px) {
-        display: none;
+        display: flex;
     }
 `;
 
@@ -132,7 +124,8 @@ const SearchInput = styled(Input)`
     padding: 10px 15px;
     outline: none;
     &::placeholder {
-        color: #888; }
+        color: #888; 
+    }
     @media screen and (min-width: 768px) {
         width: 200px;
     }
@@ -146,12 +139,43 @@ const SearchButton = styled(Button)`
     cursor: pointer;
 `;
 
+const NotificationBadge = styled.span`
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: #ff4d4f;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    line-height: 1;
+`;
+
 export default function Header() {
     const { cartProducts } = useContext(CartContext);
     const [mobileNavActive, setMobileNavActive] = useState(false);
     const { data: session } = useSession();
     const [searchTerm, setSearchTerm] = useState('');
     const router = useRouter();
+    const [friendRequestsCount, setFriendRequestsCount] = useState(0);
+
+    useEffect(() => {
+        if (session) {
+            fetchFriendRequestsCount();
+        }
+    }, [session]);
+
+    async function fetchFriendRequestsCount() {
+        try {
+            const res = await api.get("/api/friends?action=getRequests");
+            if (res.data && res.data.incoming) {
+                setFriendRequestsCount(res.data.incoming.length);
+            }
+        } catch (error) {
+            console.error("Error fetching friend requests count:", error);
+        }
+    }
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -166,40 +190,35 @@ export default function Header() {
                 <Wrapper>
                     <Logo href={'/'}>BAYmod Home</Logo>
                     
-                    {/* Desktop Navigation and Search */}
                     <StyledNav $mobileNavActive={mobileNavActive}>
                         <NavLink href={'/products'}>All products</NavLink>
                         <NavLink href={'/categories'}>Categories</NavLink>
                         {session && (
                             <NavLink href={'/account'}>Account</NavLink>
                         )}
-                        <NavLink href={'/cart'}>Cart ({cartProducts.length})</NavLink>
-                        {!session && (
-                            <SignINButton onClick={() => signIn('google')}>Sign in</SignINButton>
-                        )}
-                        <MobileSearchContainer onSubmit={handleSearch}>
+                        <SearchContainer onSubmit={handleSearch}>
                             <SearchInput 
                                 type="text"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Search..."
+                                placeholder="Search products..."
                             />
                             <SearchButton type="submit">Search</SearchButton>
-                        </MobileSearchContainer>
+                        </SearchContainer>
+                        {session && (
+                            <NavLink href={'/notifications'}>
+                                <NotificationsIcon size={20} />
+                                {friendRequestsCount > 0 && (
+                                    <NotificationBadge>{friendRequestsCount}</NotificationBadge>
+                                )}
+                            </NavLink>
+                        )}
+                        <NavLink href={'/cart'}>Cart ({cartProducts.length})</NavLink>
+                        {!session && (
+                            <SignINButton onClick={() => signIn('google')}>Sign in</SignINButton>
+                        )}
                     </StyledNav>
-
-                    {/* Desktop Search */}
-                    <SearchContainer onSubmit={handleSearch}>
-                        <SearchInput 
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search products..."
-                        />
-                        <SearchButton type="submit">Search</SearchButton>
-                    </SearchContainer>
                     
-                    {/* Mobile Navigation Button */}
                     <NavButton onClick={() => setMobileNavActive(prev => !prev)}>
                         {mobileNavActive ? <XmarkIcon /> : <BarsIcon />}
                     </NavButton>
