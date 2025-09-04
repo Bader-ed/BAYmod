@@ -83,12 +83,9 @@ export default function Featured ({product}) {
                         </div>
                     </Column>
                     <Column>
-                        
-                        <img src="https://baymod-admin.vercel.app/api/image/1755956996032-mbp_2021_bbedit_lede.png.png" alt=""/>
-                        
+                        <img src="https://baymod-admin.vercel.app/api/image/1756973251010-Apple_M1_MacBook_Air_Review.jpg.jpg" alt=""/>
                     </Column>
                 </ColumnsWrapper>
-                
             </Center>
         </Bg>
     );
