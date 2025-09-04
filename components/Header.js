@@ -4,8 +4,11 @@ import Center from "@/components/Center";
 import { useContext, useState } from "react";
 import { CartContext } from "./CartContext";
 import BarsIcon from "./icons/Bars";
-import XmarkIcon from "./icons/XmarkIcon"; // Import the new icon
-import { useSession, signIn } from "next-auth/react"
+import XmarkIcon from "./icons/XmarkIcon";
+import { useSession, signIn } from "next-auth/react";
+import Input from "./Input";
+import Button from "./Button";
+import { useRouter } from "next/router";
 
 const StyledHeader = styled.header`
     background-color: #222;
@@ -13,7 +16,7 @@ const StyledHeader = styled.header`
 
 const Logo = styled(Link)`
     color: #fff;
-    text-decoration:none;
+    text-decoration: none;
     position: relative;
     z-index: 3;
 `;
@@ -38,6 +41,7 @@ const Wrapper = styled.div`
     display: flex;
     justify-content: space-between;
     padding: 20px 0;
+    align-items: center;
 `;
 
 const StyledNav = styled.nav`
@@ -81,7 +85,7 @@ const NavLink = styled(Link)`
     }
 `;
 
-const NavButton= styled.button`
+const NavButton = styled.button`
     background-color: transparent;
     width: 30px;
     height: 30px;
@@ -95,32 +99,112 @@ const NavButton= styled.button`
     }
 `;
 
-export default function Header () {
-    const {cartProducts} = useContext(CartContext);
-    const [mobileNavActive,setMobileNavActive] = useState(false);
-    const { data: session } = useSession()
+const SearchContainer = styled.form`
+    display: flex;
+    background-color: #333;
+    border-radius: 25px;
+    overflow: hidden;
+    gap: 0;
+    align-items: center;
+    @media screen and (max-width: 767px) {
+        display: none;
+    }
+`;
+
+const MobileSearchContainer = styled.form`
+    display: flex;
+    gap: 0;
+    align-items: center;
+    padding: 10px 0;
+    background-color: #333;
+    border-radius: 25px;
+    overflow: hidden;
+    @media screen and (min-width: 768px) {
+        display: none;
+    }
+`;
+
+const SearchInput = styled(Input)`
+    width: 150px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    padding: 10px 15px;
+    outline: none;
+    &::placeholder {
+        color: #888; }
+    @media screen and (min-width: 768px) {
+        width: 200px;
+    }
+`;
+
+const SearchButton = styled(Button)`
+    padding: 10px 15px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+`;
+
+export default function Header() {
+    const { cartProducts } = useContext(CartContext);
+    const [mobileNavActive, setMobileNavActive] = useState(false);
+    const { data: session } = useSession();
+    const [searchTerm, setSearchTerm] = useState('');
+    const router = useRouter();
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchTerm.trim() !== '') {
+            router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
+        }
+    };
+
     return (
-        < StyledHeader>
-        <Center>
-            <Wrapper>
-                <Logo href={'/'}>BAYmod</Logo>
-                <StyledNav $mobileNavActive={mobileNavActive}>
-                    <NavLink href={'/'}>Home</NavLink>
-                    <NavLink href={'/products'}>All products</NavLink>
-                    <NavLink href={'/categories'}>Categories</NavLink>
-                    {session && (
-                        <NavLink href={'/account'}>Account</NavLink>
-                    )}
-                    <NavLink href={'/cart'}>Cart ({cartProducts.length})</NavLink>
-                    {!session && (
-                        <SignINButton onClick={() => signIn('google')}>Sign in</SignINButton>
-                    )}
-                </StyledNav>
-                <NavButton onClick={() => setMobileNavActive(prev => !prev)}>
-                    {mobileNavActive ? <XmarkIcon /> : <BarsIcon />}
-                </NavButton>
-            </Wrapper>
-        </Center>
-        </ StyledHeader>
+        <StyledHeader>
+            <Center>
+                <Wrapper>
+                    <Logo href={'/'}>BAYmod Home</Logo>
+                    
+                    {/* Desktop Navigation and Search */}
+                    <StyledNav $mobileNavActive={mobileNavActive}>
+                        <NavLink href={'/products'}>All products</NavLink>
+                        <NavLink href={'/categories'}>Categories</NavLink>
+                        {session && (
+                            <NavLink href={'/account'}>Account</NavLink>
+                        )}
+                        <NavLink href={'/cart'}>Cart ({cartProducts.length})</NavLink>
+                        {!session && (
+                            <SignINButton onClick={() => signIn('google')}>Sign in</SignINButton>
+                        )}
+                        <MobileSearchContainer onSubmit={handleSearch}>
+                            <SearchInput 
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Search..."
+                            />
+                            <SearchButton type="submit">Search</SearchButton>
+                        </MobileSearchContainer>
+                    </StyledNav>
+
+                    {/* Desktop Search */}
+                    <SearchContainer onSubmit={handleSearch}>
+                        <SearchInput 
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search products..."
+                        />
+                        <SearchButton type="submit">Search</SearchButton>
+                    </SearchContainer>
+                    
+                    {/* Mobile Navigation Button */}
+                    <NavButton onClick={() => setMobileNavActive(prev => !prev)}>
+                        {mobileNavActive ? <XmarkIcon /> : <BarsIcon />}
+                    </NavButton>
+                </Wrapper>
+            </Center>
+        </StyledHeader>
     );
 }
