@@ -7,13 +7,12 @@ import { Product } from "@/models/Product";
 
 
 
-
 export default function ProductsPage({products}) {
     return (
         <>
             
             <Center>
-                <Title>All product</Title>
+                <Title>All products</Title>
                 <ProductsGrid products={products}/>
             </Center>
         </>
@@ -28,5 +27,4 @@ export async function getServerSideProps() {
             products: JSON.parse(JSON.stringify(products)),
         }
     };
-
 }
