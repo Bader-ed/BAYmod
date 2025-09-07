@@ -1,3 +1,4 @@
+// components/icons/NotificationsIcon.js
 import React from 'react';
 
 export default function NotificationsIcon({size = 24}) {

@@ -1,3 +1,4 @@
+// components/Table.js
 import styled from "styled-components";
 
 const StyledTable = styled.table`

@@ -1,3 +1,4 @@
+// '/api/auth/[...nextauth].js'
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
@@ -47,7 +48,14 @@ export const authOptions = {
       }
       return true;
     },
-  },
+    async session({ session, token, user }) {
+      const client = await Client.findOne({ email: session.user.email });
+      if (client) {
+        session.user.id = client._id.toString();
+      }
+      return session;
+  }
+},
 };
 
 export default NextAuth(authOptions);

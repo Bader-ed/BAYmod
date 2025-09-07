@@ -1,3 +1,4 @@
+// components/WhiteBox.js
 import styled from "styled-components";
 
 const WhiteBox = styled.div`

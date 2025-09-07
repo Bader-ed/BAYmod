@@ -1,5 +1,7 @@
+// '/api/friends.js'
 import { mongooseConnect } from "@/lib/mongoose";
 import { Client } from "@/models/Client";
+import { Notification } from "@/models/Notification"; // Import the Notification model
 import { authOptions } from "./auth/[...nextauth]";
 import { getServerSession } from "next-auth";
 
@@ -42,44 +44,54 @@ export default async function handle(req, res) {
       case 'removeFriend':
         if (req.method !== "POST") return res.status(405).end();
         const { friendId } = data;
-        const friend = await Client.findById(friendId);
-
-        currentUser.friends = currentUser.friends.filter(id => id.toString() !== friendId);
-        friend.friends = friend.friends.filter(id => id.toString() !== currentUser._id.toString());
-
-        await currentUser.save();
-        await friend.save();
+        if (!friendId) {
+          return res.status(400).json({ error: "Friend ID is required." });
+        }
+        
+        // Remove friend from both users' friend lists
+        await Client.updateOne(
+          { _id: currentUser._id },
+          { $pull: { friends: friendId } }
+        );
+        await Client.updateOne(
+          { _id: friendId },
+          { $pull: { friends: currentUser._id } }
+        );
+        
         return res.json({ success: true, message: "Friend removed." });
 
       // Handles fetching incoming friend requests
       case 'getRequests':
-        const userWithRequests = await Client.findById(currentUser._id).populate("friendRequests", "name email image");
-        return res.json({ incoming: userWithRequests.friendRequests });
+        const userWithRequests = await Client.findById(currentUser._id).populate("friendRequests");
+        return res.json({ incoming: userWithRequests.friendRequests || [] });
 
       // Handles responding to a friend request (accept or decline)
       case 'respondToRequest':
         if (req.method !== "POST") return res.status(405).end();
         const { requesterId, accept } = data;
-
-        if (!currentUser.friendRequests.includes(requesterId)) {
-          return res.status(400).json({ error: "No such request." });
-        }
-
-        currentUser.friendRequests = currentUser.friendRequests.filter(id => id.toString() !== requesterId);
-
+        
+        // Remove the request from the current user's friendRequests array
+        await Client.updateOne(
+          { _id: currentUser._id },
+          { $pull: { friendRequests: requesterId } }
+        );
+        
         if (accept) {
-          currentUser.friends.push(requesterId);
-          const requester = await Client.findById(requesterId);
-          requester.friends.push(currentUser._id);
-          await requester.save();
+          // If accepting, add each other to their friends list
+          await Client.updateOne(
+            { _id: currentUser._id },
+            { $addToSet: { friends: requesterId } }
+          );
+          await Client.updateOne(
+            { _id: requesterId },
+            { $addToSet: { friends: currentUser._id } }
+          );
         }
+        
+        return res.json({ success: true });
 
-        await currentUser.save();
-        return res.json({ success: true, message: accept ? "Friend added." : "Request declined." });
-
-      // Handles searching for a user by email
+      // Handles searching for a user
       case 'searchUser':
-        if (req.method !== "GET") return res.status(405).end();
         const { email } = data;
         if (!email) {
           return res.status(400).json({ error: 'Email is required' });
@@ -92,33 +104,51 @@ export default async function handle(req, res) {
         if (user.email === session.user.email) {
           return res.status(400).json({ error: "You cannot add yourself." });
         }
-        return res.json(user);
+        
+        // Check if already friends or if a request is pending
+        const isAlreadyFriend = currentUser.friends.includes(user._id);
+        const isRequestPending = user.friendRequests.includes(currentUser._id);
+        
+        return res.json({ ...user.toObject(), isAlreadyFriend, isRequestPending });
 
       // Handles sending a friend request
       case 'sendRequest':
         if (req.method !== "POST") return res.status(405).end();
         const { targetEmail } = data;
-
+        
         const targetUser = await Client.findOne({ email: targetEmail });
         if (!targetUser) {
           return res.status(404).json({ error: "No user found with this email." });
         }
+        
+        // Check if already friends
         if (currentUser.friends.includes(targetUser._id)) {
           return res.status(400).json({ error: "Already friends." });
         }
+        
+        // Check if a request has already been sent
         if (targetUser.friendRequests.includes(currentUser._id)) {
           return res.status(400).json({ error: "Request already sent." });
         }
-
+        
         targetUser.friendRequests.push(currentUser._id);
         await targetUser.save();
+        
+        // --- NEW CODE: CREATE A NOTIFICATION DOCUMENT ---
+        await Notification.create({
+          recipient: targetUser._id,
+          sender: currentUser._id,
+          type: 'friendRequest',
+          relatedId: currentUser._id,
+        });
+        
         return res.json({ success: true, message: "Friend request sent." });
 
       default:
         return res.status(404).end();
     }
   } catch (error) {
-    console.error(`API action "${action}" error:`, error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    console.error("API error:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 }

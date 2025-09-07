@@ -1,3 +1,4 @@
+// '/api/search.js'
 import { Product } from "../../models/Product";
 import { mongooseConnect } from "../../lib/mongoose";
 

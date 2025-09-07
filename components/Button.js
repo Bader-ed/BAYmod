@@ -1,4 +1,4 @@
-// components/PrimaryBtn.js
+// components/Button.js
 import { primary } from "@/lib/colors";
 import styled, { css } from "styled-components";
 

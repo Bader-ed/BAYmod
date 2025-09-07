@@ -1,3 +1,4 @@
+// components/NewProducts.js
 import styled from "styled-components";
 import Center from "./Center";
 import ProductsGrid from "./ProductsGrid";

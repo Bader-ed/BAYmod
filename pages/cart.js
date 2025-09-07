@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+// '/page/cart.js'
 import styled from "styled-components";
 import Center from "@/components/Center";
 import Button from "@/components/Button";
@@ -136,7 +136,7 @@ export default function CartPage() {
   if (isSuccess) {
     return (
       <>
-        <Header />
+        
         <Center>
           <ColumnsWrapper>
             <Box>
@@ -150,7 +150,7 @@ export default function CartPage() {
   }
   return (
     <>
-      <Header />
+      
       <Center>
         <ColumnsWrapper>
           <Box>

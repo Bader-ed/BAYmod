@@ -1,7 +1,7 @@
+// '/page/account.js'
 import styled from "styled-components";
 import Center from "@/components/Center";
 import { useSession, signOut } from "next-auth/react";
-import Header from "@/components/Header";
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 
@@ -23,9 +23,9 @@ const UserInfoCard = styled.div`
   width: 100%;
   max-width: 600px;
   &:hover{
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    }
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const UserInfoHeader = styled.div`
@@ -73,9 +73,9 @@ const SettingsCard = styled.div`
   width: 100%;
   max-width: 600px;
   &:hover{
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    }
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const SettingsTitle = styled.h2`
@@ -132,6 +132,10 @@ const SearchInput = styled.input`
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  ${props => props.$hasError && `
+    border-color: red;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  `}
 `;
 
 const SearchResult = styled.div`
@@ -142,6 +146,14 @@ const SearchResult = styled.div`
   border: 1px solid #eee;
   border-radius: 8px;
   margin-bottom: 10px;
+`;
+
+const ScrollableList = styled.div`
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
 `;
 
 const FriendList = styled.ul`
@@ -167,6 +179,50 @@ const FriendImage = styled.img`
   border-radius: 50%;
 `;
 
+const RemoveButton = styled.button`
+  background-color: #f44336;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: #d32f2f;
+  }
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const AcceptButton = styled.button`
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: #45a049;
+  }
+`;
+
+const DeclineButton = styled.button`
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: #d32f2f;
+  }
+`;
+
 export default function AccountPage() {
   const { data: session } = useSession();
   const [theme, setTheme] = useState("light");
@@ -177,6 +233,7 @@ export default function AccountPage() {
   const [searchResult, setSearchResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [searchHasError, setSearchHasError] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -209,7 +266,15 @@ export default function AccountPage() {
 
   async function searchForUser() {
     if (!searchEmail) return;
+
+    if (session && searchEmail === session.user.email) {
+      setMessage("You cannot add yourself.");
+      setSearchHasError(true);
+      return;
+    }
+    
     setIsLoading(true);
+    setSearchHasError(false);
     setSearchResult(null);
     setMessage(null);
     try {
@@ -233,6 +298,8 @@ export default function AccountPage() {
         targetEmail: searchResult.email,
       });
       setMessage(res.data.message);
+      // Re-fetch friends and requests to update the UI
+      fetchData();
       setSearchEmail("");
       setSearchResult(null);
     } catch (error) {
@@ -241,24 +308,38 @@ export default function AccountPage() {
     }
   }
 
+  async function handleRemoveFriend(friendId) {
+    try {
+      await api.post("/api/friends", {
+        action: "removeFriend",
+        friendId,
+      });
+      setMessage("Friend removed successfully.");
+      fetchFriends();
+    } catch (error) {
+      console.error("Error removing friend:", error);
+      setMessage(error.response?.data?.error || "An error occurred.");
+    }
+  }
+
   async function respondToRequest(requesterId, accept) {
     try {
-      const res = await api.post("/api/friends", {
+      await api.post("/api/friends", {
         action: "respondToRequest",
         requesterId,
         accept,
       });
-      setMessage(res.data.message);
+      setMessage(accept ? "Friend added." : "Request declined.");
       fetchData();
     } catch (error) {
       console.error("Error responding to request:", error);
+      setMessage(error.response?.data?.error || "An error occurred.");
     }
   }
 
   if (!session) {
     return (
       <>
-        <Header />
         <Center>
           <AccountContainer>
             <p>Please log in to view your account.</p>
@@ -270,7 +351,6 @@ export default function AccountPage() {
 
   return (
     <>
-      <Header />
       <Center>
         <AccountContainer>
           <UserInfoCard>
@@ -283,32 +363,30 @@ export default function AccountPage() {
 
           <FriendsCard>
             <FriendsTitle>Friend Requests ({friendRequests.length})</FriendsTitle>
-            <FriendList>
-              {friendRequests.length > 0 ? (
-                friendRequests.map((request) => (
-                  <FriendItem key={request._id}>
-                    <FriendImage src={request.image} alt={request.name} />
-                    <span>
-                      {request.name} ({request.email})
-                    </span>
-                    <div>
-                      <SettingButton
-                        onClick={() => respondToRequest(request._id, true)}
-                      >
-                        Accept
-                      </SettingButton>
-                      <SettingButton
-                        onClick={() => respondToRequest(request._id, false)}
-                      >
-                        Decline
-                      </SettingButton>
-                    </div>
-                  </FriendItem>
-                ))
-              ) : (
-                <p>You have no pending friend requests.</p>
-              )}
-            </FriendList>
+            <ScrollableList>
+              <FriendList>
+                {friendRequests.length > 0 ? (
+                  friendRequests.map((request) => (
+                    <FriendItem key={request._id}>
+                      <FriendImage src={request.image} alt={request.name} />
+                      <span>
+                        {request.name} ({request.email})
+                      </span>
+                      <ActionButtons>
+                        <AcceptButton onClick={() => respondToRequest(request._id, true)}>
+                          Accept
+                        </AcceptButton>
+                        <DeclineButton onClick={() => respondToRequest(request._id, false)}>
+                          Decline
+                        </DeclineButton>
+                      </ActionButtons>
+                    </FriendItem>
+                  ))
+                ) : (
+                  <p>You have no pending friend requests.</p>
+                )}
+              </FriendList>
+            </ScrollableList>
           </FriendsCard>
 
           <FriendsCard>
@@ -318,43 +396,58 @@ export default function AccountPage() {
                 type="email"
                 placeholder="Search by email"
                 value={searchEmail}
-                onChange={(e) => setSearchEmail(e.target.value)}
+                onChange={(e) => {
+                  setSearchEmail(e.target.value);
+                  setSearchHasError(false);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') searchForUser();
                 }}
+                $hasError={searchHasError}
               />
               <SettingButton onClick={searchForUser} disabled={isLoading}>
                 {isLoading ? "Searching..." : "Search"}
               </SettingButton>
             </SearchContainer>
-
+            
             {message && <p>{message}</p>}
-
+            
             {searchResult && (
               <SearchResult>
                 <span>
                   {searchResult.name} ({searchResult.email})
                 </span>
-                <SettingButton onClick={sendFriendRequest}>
-                  Send Request
-                </SettingButton>
+                {searchResult.isAlreadyFriend ? (
+                  <span>You are already friends.</span>
+                ) : searchResult.isRequestPending ? (
+                  <span>Request already sent.</span>
+                ) : (
+                  <SettingButton onClick={sendFriendRequest}>
+                    Send Request
+                  </SettingButton>
+                )}
               </SearchResult>
             )}
-
-            <FriendList>
-              {friends.length > 0 ? (
-                friends.map((friend) => (
-                  <FriendItem key={friend._id}>
-                    <FriendImage src={friend.image} alt={friend.name} />
-                    <span>
-                      {friend.name} ({friend.email})
-                    </span>
-                  </FriendItem>
-                ))
-              ) : (
-                <p>You have no friends yet.</p>
-              )}
-            </FriendList>
+            
+            <ScrollableList>
+              <FriendList>
+                {friends.length > 0 ? (
+                  friends.map((friend) => (
+                    <FriendItem key={friend._id}>
+                      <FriendImage src={friend.image} alt={friend.name} />
+                      <span>
+                        {friend.name} ({friend.email})
+                      </span>
+                      <RemoveButton onClick={() => handleRemoveFriend(friend._id)}>
+                        Remove
+                      </RemoveButton>
+                    </FriendItem>
+                  ))
+                ) : (
+                  <p>You have no friends yet.</p>
+                )}
+              </FriendList>
+            </ScrollableList>
           </FriendsCard>
 
           <SettingsCard>

@@ -1,3 +1,4 @@
+// '/api/categories.js'
 import { mongooseConnect } from '@/lib/mongoose';
 import Category from '@/models/Category';
 import Product from '@/models/Product';
