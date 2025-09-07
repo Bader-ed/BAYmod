@@ -1,3 +1,4 @@
+// components/SignInModal.js
 import styled from "styled-components";
 import { signIn } from "next-auth/react";
 

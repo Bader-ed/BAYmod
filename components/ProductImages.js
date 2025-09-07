@@ -1,3 +1,4 @@
+// components/ProductImages.js
 import { useState } from "react";
 import styled from "styled-components";
 const Image = styled.img`

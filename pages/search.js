@@ -1,5 +1,5 @@
+// '/page/search.js'
 import Center from "../components/Center";
-import Header from "../components/Header";
 import ProductsGrid from "../components/ProductsGrid";
 import Title from "../components/Title";
 import { useState, useEffect } from "react";
@@ -29,7 +29,7 @@ export default function SearchPage() {
 
   return (
     <>
-      <Header />
+      
       <Center>
         <Title>Search results for &quot;{q}&quot;</Title>
         {loading ? (

@@ -1,3 +1,4 @@
+// components/Center.js
 import styled from "styled-components";
 
 const StiledDiv = styled.div`

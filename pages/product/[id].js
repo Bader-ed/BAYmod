@@ -1,5 +1,5 @@
+// '/page/product/[id].js'
 import Center from "@/components/Center";
-import Header from "@/components/Header";
 import Title from "@/components/Title";
 import WhiteBox from "@/components/WhiteBox";
 import { mongooseConnect } from "@/lib/mongoose";
@@ -8,8 +8,11 @@ import styled from "styled-components";
 import ProductImages from "@/components/ProductImages";
 import Button from "@/components/Button";
 import CartIcon from "@/components/icons/CartIcon";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { CartContext } from "@/components/CartContext";
+import ProductRatings from "@/components/ProductRatings";
+import ProductCommunity from "@/components/ProductCommunity";
+import { useRouter } from 'next/router';
 
 const ColWrapper = styled.div`
     display: grid;
@@ -28,16 +31,37 @@ const PriceRow = styled.div`
 const Price = styled.span`
     font-size: 1.4rem;
 `;
+const RatingWrapper = styled.div`
+    margin-bottom: 20px;
+`;
 
-export default function ProductPage ({product}) {
-    const {addProduct} = useContext(CartContext);
+export default function ProductPage({ product }) {
+    const { addProduct } = useContext(CartContext);
+    const router = useRouter();
+
+    // Use a useEffect hook to handle scrolling to a specific message ID from the URL hash
+    useEffect(() => {
+        if (router.isReady) {
+            const { asPath } = router;
+            const hash = asPath.split('#')[1];
+            if (hash) {
+                const element = document.getElementById(hash);
+                if (element) {
+                    // Give the chat a moment to render before scrolling
+                    setTimeout(() => {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                }
+            }
+        }
+    }, [router.isReady, router.asPath]);
+
     return (
         <>
-            <Header />
             <Center>
                 <ColWrapper>
                     <WhiteBox>
-                        <ProductImages images={product.images}/>
+                        <ProductImages images={product.images} />
                     </WhiteBox>
                     <div>
                         <Title>{product.title}</Title>
@@ -50,23 +74,24 @@ export default function ProductPage ({product}) {
                             </div>
                             <div>
                                 <Button primary onClick={() => addProduct(product._id)}>
-                                    <CartIcon/>Add to cart
+                                    <CartIcon />Add to cart
                                 </Button>
                             </div>
-                            
                         </PriceRow>
+                        <RatingWrapper>
+                            <ProductRatings productId={product._id} />
+                        </RatingWrapper>
                     </div>
                 </ColWrapper>
-                
+                <ProductCommunity productId={product._id} />
             </Center>
         </>
     );
 }
 
-
 export async function getServerSideProps(context) {
     await mongooseConnect();
-    const {id} = context.query;
+    const { id } = context.query;
     const product = await Product.findById(id);
     return {
         props: {

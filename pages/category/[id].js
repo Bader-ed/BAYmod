@@ -1,9 +1,10 @@
+// '/page/category/[id].js'
 import styled from 'styled-components';
 import Link from 'next/link'; // Import Link
 import { mongooseConnect } from '@/lib/mongoose';
 import { Category } from '@/models/Category';
 import { Product } from '@/models/Product';
-import Header from "@/components/Header";
+
 
 
 // --- PLACEHOLDER STYLED COMPONENTS ---
@@ -83,7 +84,7 @@ export default function CategoryProductsPage({ category, products }) {
   return (
     
     <>
-    <Header/>
+    
         <CategoriesContainer>
             <CategoryTitle>{category.name}</CategoryTitle>
             {products.length > 0 ? (

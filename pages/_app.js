@@ -1,8 +1,11 @@
+// '/page/_app.js'
 import { CartContextProvider, CartContext } from "@/components/CartContext";
 import { createGlobalStyle } from "styled-components";
 import { SessionProvider } from "next-auth/react";
 import { useContext } from "react";
 import SignInModal from "@/components/SignInModal";
+import Footer from '@/components/Footer';
+import Header from "@/components/Header";
 
 const GlobalStyles = createGlobalStyle`
   body{
@@ -27,8 +30,14 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
       <GlobalStyles />
       <SessionProvider session={session}>
         <CartContextProvider>
-          <Component {...pageProps} />
-          <ModalWrapper />
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Header/>
+            <main style={{ flexGrow: 1 }}>
+              <Component {...pageProps} />
+            </main>
+            <ModalWrapper />
+            <Footer />
+          </div>
         </CartContextProvider>
       </SessionProvider>
     </>
