@@ -5,16 +5,20 @@ import Button from "./Button";
 import Input from "./Input";
 import axios from "axios";
 import { useRouter } from "next/router";
+import UserRating from "./UserRating";
 
 const CommunityContainer = styled.div`
     margin-top: 30px;
     border-top: 1px solid #ccc;
-    padding-top: 30px;
+    padding-top: 15px;
     display: flex;
+    border-radius: 30px;
+    background-image: linear-gradient(to bottom, #dcdcdc, #a9a9a9);
     justify-content: space-between;
     gap: 20px;
     @media (max-width: 768px) {
         flex-direction: column;
+        padding-top: 0;
     }
 `;
 
@@ -22,6 +26,21 @@ const ChatWrapper = styled.div`
     flex: 3;
     display: flex;
     flex-direction: column;
+`;
+
+const CommunityHeader = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    align-items: center; 
+    gap: 1rem;
+    
+`;
+
+const UserRatingPosition = styled.div`
+    margin-right: 15px;
 `;
 
 const ChatBox = styled.div`
@@ -80,19 +99,22 @@ const ChatForm = styled.form`
     align-items: center;
     gap: 10px;
     margin-top: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 15px;
 `;
 
 const StyledMessageTime = styled.span`
     font-size: 0.75rem;
     color: #999;
 `;
-
-const StyledLink = styled.a`
-    color: #007bff;
-    text-decoration: underline;
-    &:hover {
-        color: #0056b3;
-    }
+const ProductCommunityH3 = styled.h3`
+    display: flex;
+    padding-left: 10px;
+`;
+const StyledInput = styled(Input)`
+    height: 35px;
+    flex-grow: 1;
 `;
 
 export default function ProductCommunity({ productId }) {
@@ -189,7 +211,15 @@ export default function ProductCommunity({ productId }) {
     return (
         <CommunityContainer>
             <ChatWrapper>
-                <h3>Product Community</h3>
+                <CommunityHeader>
+                    <ProductCommunityH3>
+                        Product Community
+                    </ProductCommunityH3>
+                    <UserRatingPosition>
+                        <UserRating/>
+                    </UserRatingPosition>
+                </CommunityHeader>
+                
                 <ChatBox ref={chatBoxRef}>
                     {messages.length > 0 ? (
                         messages.map(renderMessage)
@@ -199,13 +229,14 @@ export default function ProductCommunity({ productId }) {
                 </ChatBox>
                 {session ? (
                     <ChatForm onSubmit={sendMessage}>
-                        <Input
+                        <StyledInput
                             placeholder="Join the conversation..."
                             value={newMessage}
                             onChange={ev => setNewMessage(ev.target.value)}
-                            style={{ flexGrow: 1 }}
+                            
                         />
                         <Button
+                            height="35px"
                             primary
                             type="submit"
                             disabled={!newMessage.trim() || !session?.user?.id || isSubmitting}

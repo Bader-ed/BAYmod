@@ -16,6 +16,10 @@ export const ButtonStyle = css`
         height: 16px;
         margin-right: 5px;
     }
+    ${props => props.height && css`
+        height: ${props.height};
+        margin-bottom: 5px;
+    `}
     ${props => props.block && css`
     display: block;
     width: 100%;

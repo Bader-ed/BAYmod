@@ -10,21 +10,15 @@ const RatingsWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 20px;
-    border-radius: 8px;
-    min-width: 250px;
-    max-height: 150px;
     text-align: center;
     @media (max-width: 768px) {
-        margin-top: 20px;
+        margin-top: 0;
     }
 `;
 
 const RatingStars = styled.div`
     display: flex;
     justify-content: center;
-    margin: 5px 0;
-    padding-left: 8px;
     span {
         cursor: pointer;
         color: #ffc107;
@@ -40,16 +34,25 @@ const RatingStars = styled.div`
 const RatingMessage = styled.p`
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 5px;
+    /* padding-top: 5px; */
     color: #555;
+    @media (max-width: 768px) {
+        max-height: 5px;
+    }
+    
 `;
 
 const RatingForm = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     text-align: center;
     gap: 10px;
+    margin-bottom: 5px;
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 5px;
+    }
 `;
 
 
