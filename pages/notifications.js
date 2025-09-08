@@ -8,7 +8,7 @@ import axios from "axios";
 import Link from "next/link";
 import { CircleCheck, Trash2 } from "lucide-react";
 
-// Modal component to replace window.confirm()
+
 const ConfirmationModal = ({ isOpen, onConfirm, onCancel }) => {
     if (!isOpen) return null;
 
@@ -81,7 +81,7 @@ const ConfirmationModal = ({ isOpen, onConfirm, onCancel }) => {
     );
 };
 
-// Styled components for a clean, modern UI
+
 const NotificationsContainer = styled.div`
     padding: 20px 0;
     max-width: 800px;
@@ -123,7 +123,7 @@ const NotificationMessage = styled.p`
 const NotificationTime = styled.span`
     font-size: 0.8rem;
     color: #999;
-    white-space: nowrap; // Prevent time from wrapping
+    white-space: nowrap; 
     order: 2;
     @media (min-width: 768px) {
         order: initial;

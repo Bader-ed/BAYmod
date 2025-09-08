@@ -4,12 +4,14 @@ import { Rating } from "@/models/Rating";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./auth/[...nextauth]";
 import { Product } from "@/models/Product";
-// The Client model import is not necessary here because the user's ID is already available
-// in the session, and the Rating model is what holds the reference.
+
+
 
 export default async function handler(req, res) {
     await mongooseConnect();
     const { method } = req;
+    //the user's ID is in the session,
+    // and the Rating model is what holds the reference.
     const session = await getServerSession(req, res, authOptions);
 
     if (!session) {

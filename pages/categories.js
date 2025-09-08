@@ -5,7 +5,7 @@ import { mongooseConnect } from '@/lib/mongoose';
 import { Category } from '@/models/Category';
 
 
-// --- STYLED COMPONENTS ---
+
 const CategoriesContainer = styled.div`
     max-width: 500px;
     margin: 0 auto;
@@ -68,7 +68,7 @@ const EmptyState = styled.p`
     text-align: center;
     padding: 2rem;
 `;
-// ------------------------------------
+
 
 export default function CategoriesPage({ categories }) {
     if (!categories || categories.length === 0) {
@@ -94,7 +94,7 @@ export default function CategoriesPage({ categories }) {
 export async function getServerSideProps() {
     await mongooseConnect();
     try {
-        // Fetch ALL categories without building a nested structure
+        // Fetch all categories without building a nested structure
         const categories = await Category.find({}, null, { sort: { _id: 1 } }).lean();
 
         return {

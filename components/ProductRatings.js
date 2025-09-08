@@ -5,34 +5,33 @@ import StarIcon from "./icons/StarIcon";
 import axios from "axios";
 
 const RatingContainer = styled.div`
-    
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
 `;
 
 const AverageRating = styled.span`
     margin-top: 7px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #333;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
 `;
 
 const TotalRatings = styled.span`
     margin-top: 7px;
-  font-size: 0.9rem;
-  color: #555;
+    font-size: 0.9rem;
+    color: #555;
 `;
 
 const StarsWrapper = styled.div`
     margin-top: 7px;
-  display: flex;
-  color: #ff9900;
-  svg {
+    display: flex;
+    color: #ff9900;
+    svg {
     width: 20px;
     height: 20px;
-  }
+    }
 `;
 
 export default function ProductRatings({ productId }) {

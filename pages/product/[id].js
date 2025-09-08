@@ -12,7 +12,7 @@ import { useContext, useEffect } from "react";
 import { CartContext } from "@/components/CartContext";
 import ProductRatings from "@/components/ProductRatings";
 import ProductCommunity from "@/components/ProductCommunity";
-import { useRouter } from 'next/router';
+
 
 const ColWrapper = styled.div`
     display: grid;
@@ -37,24 +37,6 @@ const RatingWrapper = styled.div`
 
 export default function ProductPage({ product }) {
     const { addProduct } = useContext(CartContext);
-    const router = useRouter();
-
-    // Use a useEffect hook to handle scrolling to a specific message ID from the URL hash
-    useEffect(() => {
-        if (router.isReady) {
-            const { asPath } = router;
-            const hash = asPath.split('#')[1];
-            if (hash) {
-                const element = document.getElementById(hash);
-                if (element) {
-                    // Give the chat a moment to render before scrolling
-                    setTimeout(() => {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 500);
-                }
-            }
-        }
-    }, [router.isReady, router.asPath]);
 
     return (
         <>

@@ -117,7 +117,7 @@ const StyledInput = styled(Input)`
     flex-grow: 1;
 `;
 
-export default function ProductCommunity({ productId }) {
+export default function ProductCommunity({ productId}) {
     const { data: session } = useSession();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -141,12 +141,6 @@ export default function ProductCommunity({ productId }) {
         const intervalId = setInterval(fetchMessages, 5000);
         return () => clearInterval(intervalId);
     }, [productId]);
-
-    useEffect(() => {
-        if (chatBoxRef.current) {
-            chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
-        }
-    }, [messages]);
 
     const sendMessage = async (ev) => {
         ev.preventDefault();
@@ -216,7 +210,7 @@ export default function ProductCommunity({ productId }) {
                         Product Community
                     </ProductCommunityH3>
                     <UserRatingPosition>
-                        <UserRating/>
+                        <UserRating productId={productId}/>
                     </UserRatingPosition>
                 </CommunityHeader>
                 
