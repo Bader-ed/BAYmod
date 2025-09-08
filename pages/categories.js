@@ -5,9 +5,9 @@ import { mongooseConnect } from '@/lib/mongoose';
 import { Category } from '@/models/Category';
 
 
-// --- PLACEHOLDER STYLED COMPONENTS ---
+// --- STYLED COMPONENTS ---
 const CategoriesContainer = styled.div`
-    max-width: 1200px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 2rem;
     font-family: inherit;
@@ -24,11 +24,14 @@ const HeaderTitle = styled.h1`
 const CategoryList = styled.ul`
     list-style: none;
     padding: 0;
-    margin-top: 15px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
 `;
 
 const CategoryItem = styled.li`
-    margin-bottom: 1rem;
+    
 `;
 
 const CategoryLink = styled(Link)`
@@ -36,10 +39,14 @@ const CategoryLink = styled(Link)`
     background-color: #f8f9fa;
     border-radius: 8px;
     padding: 1.5rem;
+    
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     text-decoration: none;
     color: #343a40;
     transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    height: 40px;
+    padding-bottom: 16px;
 
     &:hover {
         background-color: #e9ecef;
@@ -47,6 +54,7 @@ const CategoryLink = styled(Link)`
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 `;
+
 
 const CategoryName = styled.h2`
     font-size: 1.5rem;
@@ -62,80 +70,44 @@ const EmptyState = styled.p`
 `;
 // ------------------------------------
 
-// Recursive component to display nested categories
-function CategoryNode({ category }) {
-    const hasChildren = category.children && category.children.length > 0;
-    return (
-    <>
-        <CategoryItem>
-            <CategoryLink href={`/category/${category._id}`}>
-                <CategoryName>{category.name}</CategoryName>
-            </CategoryLink>
-            {hasChildren && (
-            <CategoryList>
-                {category.children.map(child => (
-                    <CategoryNode key={child._id} category={child} />
-                ))}
-            </CategoryList>
-            )}
-        </CategoryItem>
-    </>
-    );
-}
-
 export default function CategoriesPage({ categories }) {
     if (!categories || categories.length === 0) {
         return <EmptyState>No categories found.</EmptyState>;
     }
 
     return (
-        <>
-            
-                <CategoriesContainer>
-                    <HeaderTitle>Shop by Category</HeaderTitle>
-                    <CategoryList>
-                        {categories.map(category => (
-                            <CategoryNode key={category._id} category={category} />
-                        ))}
-                    </CategoryList>
-                </CategoriesContainer>
-        </>
+        <CategoriesContainer>
+            <HeaderTitle>Shop by Category</HeaderTitle>
+            <CategoryList>
+                {categories.map(category => (
+                    <CategoryItem key={category._id}>
+                        <CategoryLink href={`/category/${category._id}`}>
+                            <CategoryName>{category.name}</CategoryName>
+                        </CategoryLink>
+                    </CategoryItem>
+                ))}
+            </CategoryList>
+        </CategoriesContainer>
     );
 }
 
 export async function getServerSideProps() {
     await mongooseConnect();
     try {
-    const categories = await Category.find().lean();
+        // Fetch ALL categories without building a nested structure
+        const categories = await Category.find({}, null, { sort: { _id: 1 } }).lean();
 
-    // Build a nested structure from the flat list
-    const categoryMap = {};
-    categories.forEach(cat => {
-        categoryMap[cat._id] = { ...cat, children: [] };
-    });
-
-    const nestedCategories = [];
-    categories.forEach(cat => {
-        if (cat.parent) {
-            if (categoryMap[cat.parent]) {
-                categoryMap[cat.parent].children.push(categoryMap[cat._id]);
-            }
-        } else {
-            nestedCategories.push(categoryMap[cat._id]);
-        }
-    });
-
-    return {
-        props: {
-            categories: JSON.parse(JSON.stringify(nestedCategories)),
-        },
-    };
+        return {
+            props: {
+                categories: JSON.parse(JSON.stringify(categories)),
+            },
+        };
     } catch (error) {
         console.error('Error fetching categories:', error);
-    return {
-        props: {
-            categories: [],
-        },
-    };
+        return {
+            props: {
+                categories: [],
+            },
+        };
     }
 }
