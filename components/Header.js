@@ -143,16 +143,16 @@ const SearchButton = styled(Button)`
 
 const NotificationBadge = styled.span`
     position: absolute;
-    top: -5px;
-    margin-top: 5px;
-    right: 10px;
+    top: 0px; // Adjust for better vertical alignment with the icon
+    right: -5px; // Adjust for better horizontal placement
     background-color: #ff4d4f;
     color: white;
     border-radius: 50%;
-    padding: 50px 100px;
+    padding: 2px 6px;
     font-size: 0.75rem;
     font-weight: bold;
-    line-height: 2;
+    line-height: 1; // Corrects the vertical stretching
+    white-space: nowrap; // Prevents the number from wrapping
 `;
 
 // Container for mobile-only actions like search and notifications
@@ -270,6 +270,12 @@ export default function Header() {
                         {!session && (
                             <SignINButton onClick={() => signIn('google')}>Sign in</SignINButton>
                         )}
+                        <NavLink href={'/notifications'}>
+                                <NotificationsIcon size={20} />
+                                {notificationsCount > 0 && (
+                                    <NotificationBadge>{notificationsCount}</NotificationBadge>
+                                )}
+                            </NavLink>
                     </StyledNav>
                     
                     {/* These mobile-only actions appear next to the menu button */}
