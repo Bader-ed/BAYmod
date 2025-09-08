@@ -1,13 +1,13 @@
 // '/page/category/[id].js'
 import styled from 'styled-components';
-import Link from 'next/link'; // Import Link
+import Link from 'next/link';
 import { mongooseConnect } from '@/lib/mongoose';
 import { Category } from '@/models/Category';
 import { Product } from '@/models/Product';
 
 
 
-// --- PLACEHOLDER STYLED COMPONENTS ---
+
 const CategoriesContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
@@ -28,15 +28,15 @@ const ProductGrid = styled.div`
   gap: 2rem;
 `;
 
-const ProductCard = styled(Link)` // Modified to be a Link component
+const ProductCard = styled(Link)`
   background-color: #fff;
   border-radius: 8px;
   padding: 1.5rem;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-decoration: none; // Remove underline from links
-  color: inherit; // Inherit text color
+  text-decoration: none;
+  color: inherit; 
 
   &:hover {
     transform: translateY(-5px);
@@ -73,7 +73,7 @@ const EmptyState = styled.p`
   text-align: center;
   padding: 2rem;
 `;
-// ------------------------------------
+
 
 export default function CategoryProductsPage({ category, products }) {
 

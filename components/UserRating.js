@@ -10,21 +10,15 @@ const RatingsWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 20px;
-    border-radius: 8px;
-    min-width: 250px;
-    max-height: 150px;
     text-align: center;
     @media (max-width: 768px) {
-        margin-top: 20px;
+        margin-top: 0;
     }
 `;
 
 const RatingStars = styled.div`
     display: flex;
     justify-content: center;
-    margin: 5px 0;
-    padding-left: 8px;
     span {
         cursor: pointer;
         color: #ffc107;
@@ -40,79 +34,115 @@ const RatingStars = styled.div`
 const RatingMessage = styled.p`
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 5px;
     color: #555;
+    @media (max-width: 768px) {
+        max-height: 5px;
+    }
+    
 `;
 
 const RatingForm = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     text-align: center;
     gap: 10px;
+    margin-bottom: 5px;
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 5px;
+    }
 `;
 
 
 
 export default function UserRating({ productId }) {
     const { data: session } = useSession();
-    const [rating, setRating] = useState(0);
-    const [hoverRating, setHoverRating] = useState(0);
     const [userRating, setUserRating] = useState(null);
+    const [rating, setRating] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
+    const [message, setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
+    // This useEffect hook is important to fetch the user's existing rating
+    // when the component loads or the user session changes.
     useEffect(() => {
-        if (session && productId) {
-            fetchUserRating();
-        }
-    }, [productId, session]);
-
-    async function fetchUserRating() {
-        try {
-            const { data: allRatings } = await axios.get(`/api/ratings?productId=${productId}`);
-            const currentUserRating = allRatings.find(r => r.user === session.user.id);
-            
-            if (currentUserRating) {
-                setUserRating(currentUserRating);
-                setRating(currentUserRating.stars);
-            }
-        } catch (error) {
-            console.error("Failed to fetch user rating:", error);
-        }
-    }
-
-    async function handleRatingSubmit() {
-        if (!rating || !session?.user?.id) {
-            console.error("Rating or session data is missing.");
+        if (!session || !productId) {
             return;
         }
+        
+        // Fetch the user's existing rating
+        fetchUserRating();
+    }, [session, productId]);
 
+    // Function to fetch the existing rating for the current user and product
+    async function fetchUserRating() {
         try {
-            if (userRating) {
-                // Update existing rating with PUT
-                await axios.put('/api/ratings', { productId, stars: rating });
-            } else {
-                // Create new rating with POST
-                await axios.post('/api/ratings', { productId, stars: rating });
+            const res = await axios.get(`/api/ratings?productId=${productId}`);
+            const myRating = res.data.find(r => r.user === session.user.id);
+            if (myRating) {
+                setUserRating(myRating);
+                setRating(myRating.stars);
+                setIsEditing(false);
             }
-            await fetchUserRating(); // Fetch updated rating
-            setIsEditing(false);
         } catch (error) {
-            console.error("Failed to submit rating:", error);
+            console.error("Error fetching user rating:", error);
         }
     }
 
-    const renderStars = (currentRating) => {
+    // This function handles the submission of the rating.
+    async function handleRatingSubmit() {
+        if (!rating) {
+            setMessage('Please select a star rating.');
+            return;
+        }
+        if (!productId) {
+            setMessage('Product ID is missing.');
+            return;
+        }
+        
+        // The endpoint URL remains the same
+        const url = '/api/ratings';
+        const data = { productId, stars: rating };
+
+        setIsLoading(true);
+        setMessage('');
+
+        try {
+            // Check if the user has already rated the product
+            if (userRating) {
+                // If a rating exists, use a PUT request to update it
+                await axios.put(url, data);
+                setMessage('Rating updated successfully!');
+            } else {
+                // Otherwise, use a POST request to create a new rating
+                await axios.post(url, data);
+                setMessage('Rating submitted successfully!');
+            }
+            // After successful submission, refetch the rating to update the UI
+            await fetchUserRating();
+        } catch (error) {
+            console.error("Error submitting rating:", error.response?.data?.error || error.message);
+            // Display the specific error message from the backend, or a generic one if not available.
+            setMessage('Error: ' + (error.response?.data?.error || 'Failed to submit rating.'));
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    // This function handles the click event on a star.
+    const handleStarClick = (starIndex) => {
+        setRating(starIndex);
+        setMessage('');
+    };
+
+    // Helper function to render the star icons based on the current rating value
+    const renderStars = (starCount) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
             stars.push(
-                <span 
-                    key={i}
-                    onClick={() => setRating(i)}
-                    onMouseEnter={() => setHoverRating(i)}
-                    onMouseLeave={() => setHoverRating(0)}
-                >
-                    <StarIcon filled={(hoverRating >= i || currentRating >= i)}/>
+                <span key={i} onClick={() => handleStarClick(i)}>
+                    <StarIcon filled={i <= starCount} />
                 </span>
             );
         }

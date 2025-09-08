@@ -2,7 +2,6 @@ import { mongooseConnect } from "@/lib/mongoose";
 import { ChatMessage } from "@/models/ChatMessage";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
-import { Product } from "@/models/Product";
 import { Client } from "@/models/Client";
 import { Notification } from "@/models/Notification";
 

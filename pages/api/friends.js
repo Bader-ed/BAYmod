@@ -1,7 +1,7 @@
 // '/api/friends.js'
 import { mongooseConnect } from "@/lib/mongoose";
 import { Client } from "@/models/Client";
-import { Notification } from "@/models/Notification"; // Import the Notification model
+import { Notification } from "@/models/Notification";
 import { authOptions } from "./auth/[...nextauth]";
 import { getServerSession } from "next-auth";
 
@@ -134,7 +134,7 @@ export default async function handle(req, res) {
         targetUser.friendRequests.push(currentUser._id);
         await targetUser.save();
         
-        // --- NEW CODE: CREATE A NOTIFICATION DOCUMENT ---
+        // Create a notification document
         await Notification.create({
           recipient: targetUser._id,
           sender: currentUser._id,
