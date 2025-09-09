@@ -4,9 +4,10 @@ import styled from "styled-components";
 import Center from "@/components/Center";
 import Title from "@/components/Title";
 import { useSession } from "next-auth/react";
-import axios from "axios";
+
 import Link from "next/link";
 import { CircleCheck, Trash2 } from "lucide-react";
+import api from "@/lib/axios";
 
 
 const ConfirmationModal = ({ isOpen, onConfirm, onCancel }) => {
@@ -180,7 +181,7 @@ export default function NotificationsPage() {
     // Fetches all notifications for the logged-in user
     const fetchNotifications = async () => {
         try {
-            const res = await axios.get('/api/notifications');
+            const res = await api.get('/api/notifications');
             setNotifications(res.data);
             const unread = res.data.filter(n => !n.isRead).length;
             setUnreadCount(unread);
@@ -194,7 +195,7 @@ export default function NotificationsPage() {
     // Marks a single notification as read by sending a PUT request with the notification ID
     const markAsRead = async (notificationId) => {
         try {
-            await axios.put('/api/notifications', { id: notificationId });
+            await api.put('/api/notifications', { id: notificationId });
             setNotifications(prevNotifications => {
                 const updatedNotifications = prevNotifications.map(n => 
                     n._id === notificationId ? { ...n, isRead: true } : n
@@ -214,7 +215,7 @@ export default function NotificationsPage() {
     // Marks all unread notifications as read
     const markAllAsRead = async () => {
         try {
-            await axios.put('/api/notifications', { markAll: true });
+            await api.put('/api/notifications', { markAll: true });
             setNotifications(prevNotifications => 
                 prevNotifications.map(n => ({ ...n, isRead: true }))
             );
@@ -233,7 +234,7 @@ export default function NotificationsPage() {
     const handleConfirmDelete = async () => {
         if (!notificationToDelete) return;
         try {
-            await axios.delete('/api/notifications', { data: { id: notificationToDelete } });
+            await api.delete('/api/notifications', { data: { id: notificationToDelete } });
             setNotifications(prevNotifications => prevNotifications.filter(n => n._id !== notificationToDelete));
         } catch (error) {
             console.error('Error deleting notification:', error);

@@ -2,7 +2,7 @@
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import StarIcon from "./icons/StarIcon";
-import axios from "axios";
+import api from "@/lib/axios";
 
 const RatingContainer = styled.div`
     display: flex;
@@ -43,7 +43,7 @@ export default function ProductRatings({ productId }) {
 
     async function fetchRatings() {
         try {
-            const { data } = await axios.get(`/api/ratings?productId=${productId}`);
+            const { data } = await api.get(`/api/ratings?productId=${productId}`);
             setRatings(data);
         } catch (error) {
             console.error("Failed to fetch ratings:", error);
