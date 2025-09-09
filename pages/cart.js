@@ -4,9 +4,9 @@ import Center from "@/components/Center";
 import Button from "@/components/Button";
 import {useContext, useEffect, useState} from "react";
 import {CartContext} from "@/components/CartContext";
-import axios from "axios";
 import Table from "@/components/Table";
 import Input from "@/components/Input";
+import api from "@/lib/axios";
 
 const ColumnsWrapper = styled.div`
   display: grid;
@@ -95,7 +95,7 @@ export default function CartPage() {
   const [isSuccess,setIsSuccess] = useState(false);
   useEffect(() => {
     if (cartProducts.length > 0) {
-      axios.post('/api/cart', {ids:cartProducts})
+      api.post('/api/cart', {ids:cartProducts})
         .then(response => {
           setProducts(response.data);
         })
@@ -119,7 +119,7 @@ export default function CartPage() {
     removeProduct(id);
   }
   async function goToPayment() {
-    const response = await axios.post('/api/checkout', {
+    const response = await api.post('/api/checkout', {
       name,email,city,postalCode,streetAddress,country,
       cartProducts,
     });

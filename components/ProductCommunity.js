@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Button from "./Button";
 import Input from "./Input";
-import axios from "axios";
 import { useRouter } from "next/router";
 import UserRating from "./UserRating";
+import api from "@/lib/axios";
 
 const CommunityContainer = styled.div`
     margin-top: 30px;
@@ -127,7 +127,7 @@ export default function ProductCommunity({ productId}) {
 
     const fetchMessages = async () => {
         try {
-            const res = await axios.get('/api/messages', {
+            const res = await api.get('/api/messages', {
                 params: { productId }
             });
             setMessages(res.data);
@@ -148,7 +148,7 @@ export default function ProductCommunity({ productId}) {
 
         setIsSubmitting(true);
         try {
-            await axios.post('/api/messages', {
+            await api.post('/api/messages', {
                 productId,
                 message: newMessage,
                 userId: session.user.id

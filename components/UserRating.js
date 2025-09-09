@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Button from "./Button";
-import axios from "axios";
 import StarIcon from "./icons/StarIcon";
+import api from "@/lib/axios";
 
 const RatingsWrapper = styled.div`
     display: flex;
@@ -78,7 +78,7 @@ export default function UserRating({ productId }) {
     // Function to fetch the existing rating for the current user and product
     async function fetchUserRating() {
         try {
-            const res = await axios.get(`/api/ratings?productId=${productId}`);
+            const res = await api.get(`/api/ratings?productId=${productId}`);
             const myRating = res.data.find(r => r.user === session.user.id);
             if (myRating) {
                 setUserRating(myRating);
@@ -112,11 +112,11 @@ export default function UserRating({ productId }) {
             // Check if the user has already rated the product
             if (userRating) {
                 // If a rating exists, use a PUT request to update it
-                await axios.put(url, data);
+                await api.put(url, data);
                 setMessage('Rating updated successfully!');
             } else {
                 // Otherwise, use a POST request to create a new rating
-                await axios.post(url, data);
+                await api.post(url, data);
                 setMessage('Rating submitted successfully!');
             }
             // After successful submission, refetch the rating to update the UI
