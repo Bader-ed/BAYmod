@@ -252,6 +252,7 @@ export default function Header() {
                     
                     {/* The StyledNav is for desktop and slides in from the side on mobile */}
                     <StyledNav $mobileNavActive={mobileNavActive}>
+                        
                         <NavLink href={'/products'}>All products</NavLink>
                         <NavLink href={'/categories'}>Categories</NavLink>
                         {session && (
@@ -270,16 +271,19 @@ export default function Header() {
                         {!session && (
                             <SignINButton onClick={() => signIn('google')}>Sign in</SignINButton>
                         )}
-                        <NavLink href={'/notifications'}>
+                        {!mobileNavActive && (
+                            <NavLink href={'/notifications'}>
                                 <NotificationsIcon size={20} />
                                 {notificationsCount > 0 && (
                                     <NotificationBadge>{notificationsCount}</NotificationBadge>
                                 )}
                             </NavLink>
+                        )}
+                        
                     </StyledNav>
                     
                     {/* These mobile-only actions appear next to the menu button */}
-                    {session && (
+                    
                         <MobileActions>
                             <MobileSearchContainer onSubmit={handleSearch}>
                                 <MobileSearchInput 
@@ -290,14 +294,16 @@ export default function Header() {
                                 />
                                 <MobileSearchButton type="submit">Search</MobileSearchButton>
                             </MobileSearchContainer>
+                            {session && (
                             <NavLink href={'/notifications'}>
                                 <NotificationsIcon size={20} />
                                 {notificationsCount > 0 && (
                                     <NotificationBadge>{notificationsCount}</NotificationBadge>
                                 )}
                             </NavLink>
+                            )}
                         </MobileActions>
-                    )}
+                    
                     
                     {/* The NavButton is the last item in the wrapper, placing it on the far right */}
                     <NavButton onClick={() => setMobileNavActive(prev => !prev)}>
