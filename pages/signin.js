@@ -2,7 +2,7 @@ import styled from "styled-components";
 import Center from "@/components/Center";
 import Title from "@/components/Title";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
-import { getSession } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 
 // Styled components for the sign-in page layout
 const Wrapper = styled.div`
