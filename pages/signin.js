@@ -1,10 +1,8 @@
 import styled from "styled-components";
 import Center from "@/components/Center";
-import WhiteBox from "@/components/WhiteBox";
 import Title from "@/components/Title";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
-import { signIn } from "next-auth/react";
-
+import { getSession } from "next-auth/react";
 
 // Styled components for the sign-in page layout
 const Wrapper = styled.div`
@@ -28,8 +26,6 @@ const Content = styled.div`
 const SignInContext = styled.p`
     font-size: 1rem;
     font-family: 'Poppins', sans-serif;
-    
-
 `;
 
 
@@ -47,4 +43,21 @@ export default function SignInPage() {
             </Wrapper>
         </Center>
     );
+}
+
+export async function getServerSideProps(context) {
+    const session = await getSession(context);
+
+    if (session) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false,
+            },
+        };
+    }
+
+    return {
+        props: {},
+    };
 }
