@@ -38,7 +38,7 @@ export default function SignInPage() {
                     <SignInContext>
                         Log in to your account
                     </SignInContext>
-                    <GoogleSignInButton onClick={() => signIn('google', { callbackUrl: '/' })}/>
+                    <GoogleSignInButton onClick={() => signIn('google', { callbackUrl: '/', prompt: "select_account", })}/>
                 </Content>
             </Wrapper>
         </Center>
