@@ -222,7 +222,9 @@ export default function Header() {
             console.error("Error fetching notifications count:", error);
         }
     }
-
+    function closeMobileNav() {
+        setMobileNavActive(false);
+    }
       // Initial fetch on session change
     useEffect(() => {
         if (session) {
@@ -241,6 +243,7 @@ export default function Header() {
         e.preventDefault();
         if (searchTerm.trim() !== '') {
             router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
+
         }
     };
 
@@ -248,15 +251,15 @@ export default function Header() {
         <StyledHeader>
             <Center>
                 <Wrapper>
-                    <Logo href={'/'}>BAYmod Home</Logo>
+                    <Logo href={'/'} onClick={closeMobileNav}>BAYmod Home</Logo>
                     
                     {/* The StyledNav is for desktop and slides in from the side on mobile */}
                     <StyledNav $mobileNavActive={mobileNavActive}>
                         
-                        <NavLink href={'/products'}>All products</NavLink>
-                        <NavLink href={'/categories'}>Categories</NavLink>
+                        <NavLink href={'/products'} onClick={closeMobileNav}>All products</NavLink>
+                        <NavLink href={'/categories'} onClick={closeMobileNav}>Categories</NavLink>
                         {session && (
-                            <NavLink href={'/account'}>Account</NavLink>
+                            <NavLink href={'/account'} onClick={closeMobileNav}>Account</NavLink>
                         )}
                         <SearchContainer onSubmit={handleSearch}>
                             <SearchInput 
@@ -267,11 +270,12 @@ export default function Header() {
                             />
                             <SearchButton type="submit">Search</SearchButton>
                         </SearchContainer>
-                        <NavLink href={'/cart'}>Cart ({cartProducts.length})</NavLink>
+                        <NavLink href={'/cart'} onClick={closeMobileNav}>Cart ({cartProducts.length})</NavLink>
                         {!session && (
-                            <SignINButton onClick={() => signIn('google')}>Sign in</SignINButton>
+                            <NavLink href={'/signin'} onClick={closeMobileNav}>Sign in</NavLink>
                         )}
-                        {!mobileNavActive && (
+                        
+                        {!mobileNavActive && session && (
                             <NavLink href={'/notifications'}>
                                 <NotificationsIcon size={20} />
                                 {notificationsCount > 0 && (
