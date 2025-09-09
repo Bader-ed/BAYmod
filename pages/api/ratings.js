@@ -4,7 +4,7 @@ import { Rating } from "@/models/Rating";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./auth/[...nextauth]";
 import { Product } from "@/models/Product";
-
+import { Client } from "@/models/Client";
 
 
 export default async function handler(req, res) {
