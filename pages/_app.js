@@ -6,7 +6,7 @@ import { useContext } from "react";
 import SignInModal from "@/components/SignInModal";
 import Footer from '@/components/Footer';
 import Header from "@/components/Header";
-
+import { SpeedInsights } from '@vercel/speed-insights/next';
 const GlobalStyles = createGlobalStyle`
   body{
     background-color: #eee;
@@ -34,6 +34,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
             <Header/>
             <main style={{ flexGrow: 1 }}>
               <Component {...pageProps} />
+              <SpeedInsights />
             </main>
             <ModalWrapper />
             <Footer />
