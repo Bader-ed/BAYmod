@@ -65,7 +65,7 @@ const StyledButton = styled.button`
     ${ButtonStyle}
 `;
 
-// Define the PrimaryBtn component that renders the StyledButton
+// define the PrimaryBtn component that renders the StyledButton
 export default function Button({ children, primary, white, black, outline, block, size, height, ...rest }) {
     return (
         <StyledButton $primary={primary}

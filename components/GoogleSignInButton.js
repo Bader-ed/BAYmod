@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-// This styled component is a container for the SVG, making it a clickable button.
+
 const StyledButton = styled.button`
     background: none;
     border: none;
@@ -10,7 +10,7 @@ const StyledButton = styled.button`
     width: 175px;
     height: 40px;
     
-    // Disable default button focus outline
+    // disable default button focus outline
     &:focus-visible {
         outline: 2px solid #1a73e8;
         outline-offset: 2px;

@@ -110,7 +110,7 @@ const NotificationCard = styled.div`
         transform: translateY(-2px);
     }
     opacity: ${props => props.$isRead ? 0.6 : 1};
-    // Make it mobile responsive
+    // make it mobile responsive
     flex-wrap: wrap; 
 `;
 
@@ -178,7 +178,7 @@ export default function NotificationsPage() {
     const [notificationToDelete, setNotificationToDelete] = useState(null);
     const [unreadCount, setUnreadCount] = useState(0);
 
-    // Fetches all notifications for the logged-in user
+    // fetches all notifications for the logged-in user
     const fetchNotifications = async () => {
         try {
             const res = await api.get('/api/notifications');
@@ -192,7 +192,7 @@ export default function NotificationsPage() {
         }
     };
 
-    // Marks a single notification as read by sending a PUT request with the notification ID
+    // marks a single notification as read by sending a PUT request with the notification ID
     const markAsRead = async (notificationId) => {
         try {
             await api.put('/api/notifications', { id: notificationId });
@@ -200,7 +200,7 @@ export default function NotificationsPage() {
                 const updatedNotifications = prevNotifications.map(n => 
                     n._id === notificationId ? { ...n, isRead: true } : n
                 );
-                // Decrement the unread count only if the notification was previously unread
+                // decrement the unread count only if the notification was previously unread
                 const wasUnread = prevNotifications.find(n => n._id === notificationId && !n.isRead);
                 if (wasUnread) {
                     setUnreadCount(prevCount => prevCount - 1);
@@ -212,7 +212,7 @@ export default function NotificationsPage() {
         }
     };
 
-    // Marks all unread notifications as read
+    // marks all unread notifications as read
     const markAllAsRead = async () => {
         try {
             await api.put('/api/notifications', { markAll: true });
@@ -225,7 +225,7 @@ export default function NotificationsPage() {
         }
     };
     
-    // Deletes a single notification
+    // deletes a single notification
     const handleDeleteClick = (notificationId) => {
         setNotificationToDelete(notificationId);
         setShowDeleteModal(true);
@@ -249,7 +249,7 @@ export default function NotificationsPage() {
         setNotificationToDelete(null);
     };
 
-    // Renders each notification card based on its type
+    // renders each notification card based on its type
     const renderNotification = (notification) => {
         const timeAgo = new Date(notification.createdAt).toLocaleString();
         
@@ -304,7 +304,7 @@ export default function NotificationsPage() {
         }
     };
 
-    // Fetch notifications on component mount or when the user session changes
+    // fetch notifications on component mount or when the user session changes
     useEffect(() => {
         if (session) {
             fetchNotifications();

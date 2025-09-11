@@ -94,7 +94,7 @@ export default function CategoriesPage({ categories }) {
 export async function getServerSideProps() {
     await mongooseConnect();
     try {
-        // Fetch all categories without building a nested structure
+        // fetch all categories without building a nested structure
         const categories = await Category.find({}, null, { sort: { _id: 1 } }).lean();
 
         return {

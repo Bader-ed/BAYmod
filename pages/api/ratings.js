@@ -46,7 +46,7 @@ export default async function handler(req, res) {
                 return res.status(404).json({ error: 'Product not found.' });
             }
 
-            // Check if the user has already rated this product
+            // check if the user has already rated this product
             const existingRating = await Rating.findOne({ product: productId, user: userId });
             if (existingRating) {
                 return res.status(409).json({ error: 'You have already rated this product.' });

@@ -298,7 +298,7 @@ export default function AccountPage() {
         targetEmail: searchResult.email,
       });
       setMessage(res.data.message);
-      // Re-fetch friends and requests to update the UI
+      // refetch friends and requests to update the UI
       fetchData();
       setSearchEmail("");
       setSearchResult(null);

@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         }
 
         try {
-            // Find the current user and populate their friends
+            // find the current user and populate their friends
             const currentUser = await Client.findOne({ email: session.user.email }).populate('friends');
             if (!currentUser) {
                 return res.status(404).json({ error: "User not found." });
@@ -55,11 +55,11 @@ export default async function handler(req, res) {
             const lowerCaseMessage = message.toLowerCase();
             let mentionedIds = new Set();
             
-            // Iterate through the current user's friends to find mentions
+            // iterate through the current user's friends to find mentions
             for (const friend of currentUser.friends) {
                 const mentionString = `@${friend.name.toLowerCase()}`;
                 if (lowerCaseMessage.includes(mentionString)) {
-                    // Friend is mentioned
+                    // friend is mentioned
                     if (friend._id.toString() !== userId) {
                         if (!mentionedIds.has(friend._id.toString())) {
                             await Notification.create({

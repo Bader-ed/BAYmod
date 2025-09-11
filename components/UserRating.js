@@ -64,18 +64,18 @@ export default function UserRating({ productId }) {
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // This useEffect hook is important to fetch the user's existing rating
+    // this useEffect hook is important to fetch the user's existing rating
     // when the component loads or the user session changes.
     useEffect(() => {
         if (!session || !productId) {
             return;
         }
         
-        // Fetch the user's existing rating
+        // fetch the user's existing rating
         fetchUserRating();
     }, [session, productId]);
 
-    // Function to fetch the existing rating for the current user and product
+    // function to fetch the existing rating for the current user and product
     async function fetchUserRating() {
         try {
             const res = await api.get(`/api/ratings?productId=${productId}`);
@@ -90,7 +90,7 @@ export default function UserRating({ productId }) {
         }
     }
 
-    // This function handles the submission of the rating.
+    // this function handles the submission of the rating.
     async function handleRatingSubmit() {
         if (!rating) {
             setMessage('Please select a star rating.');
@@ -101,7 +101,7 @@ export default function UserRating({ productId }) {
             return;
         }
         
-        // The endpoint URL remains the same
+        // the endpoint URL remains the same
         const url = '/api/ratings';
         const data = { productId, stars: rating };
 
@@ -109,34 +109,34 @@ export default function UserRating({ productId }) {
         setMessage('');
 
         try {
-            // Check if the user has already rated the product
+            // check if the user has already rated the product
             if (userRating) {
-                // If a rating exists, use a PUT request to update it
+                // if a rating exists, use a PUT request to update it
                 await api.put(url, data);
                 setMessage('Rating updated successfully!');
             } else {
-                // Otherwise, use a POST request to create a new rating
+                // otherwise, use a POST request to create a new rating
                 await api.post(url, data);
                 setMessage('Rating submitted successfully!');
             }
-            // After successful submission, refetch the rating to update the UI
+            // after successful submission, refetch the rating to update the UI
             await fetchUserRating();
         } catch (error) {
             console.error("Error submitting rating:", error.response?.data?.error || error.message);
-            // Display the specific error message from the backend, or a generic one if not available.
+            // display the specific error message from the backend, or a generic one if not available.
             setMessage('Error: ' + (error.response?.data?.error || 'Failed to submit rating.'));
         } finally {
             setIsLoading(false);
         }
     }
 
-    // This function handles the click event on a star.
+    // this function handles the click event on a star.
     const handleStarClick = (starIndex) => {
         setRating(starIndex);
         setMessage('');
     };
 
-    // Helper function to render the star icons based on the current rating value
+    // helper function to render the star icons based on the current rating value
     const renderStars = (starCount) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
