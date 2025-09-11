@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   try {
     const categories = await Category.find().lean();
     
-    // Fetch products for each category
+    // fetch products for each category
     const categoriesWithProducts = await Promise.all(
       categories.map(async (category) => {
         const products = await Product.find({ category: category._id }).lean();

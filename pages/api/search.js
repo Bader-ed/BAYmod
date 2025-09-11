@@ -3,7 +3,7 @@ import { Product } from "../../models/Product";
 import { mongooseConnect } from "../../lib/mongoose";
 
 export default async function handle(req, res) {
-  // Ensure the database connection is established
+  // ensure the database connection is established
   await mongooseConnect();
 
   const { q } = req.query;

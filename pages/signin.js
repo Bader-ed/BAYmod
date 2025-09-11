@@ -4,7 +4,7 @@ import Title from "@/components/Title";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { getSession, signIn } from "next-auth/react";
 
-// Styled components for the sign-in page layout
+
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;

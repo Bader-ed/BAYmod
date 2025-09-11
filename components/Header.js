@@ -143,19 +143,19 @@ const SearchButton = styled(Button)`
 
 const NotificationBadge = styled.span`
     position: absolute;
-    top: 0px; // Adjust for better vertical alignment with the icon
-    right: -5px; // Adjust for better horizontal placement
+    top: 0px; 
+    right: -5px; 
     background-color: #ff4d4f;
     color: white;
     border-radius: 50%;
     padding: 2px 6px;
     font-size: 0.75rem;
     font-weight: bold;
-    line-height: 1; // Corrects the vertical stretching
-    white-space: nowrap; // Prevents the number from wrapping
+    line-height: 1; 
+    white-space: nowrap; 
 `;
 
-// Container for mobile-only actions like search and notifications
+
 const MobileActions = styled.div`
     display: flex;
     align-items: center;
@@ -163,11 +163,11 @@ const MobileActions = styled.div`
     margin-top: 3px;
     
     @media screen and (min-width: 768px) {
-        display: none; // Hide on larger screens
+        display: none; 
     }
 `;
 
-// Mobile-specific search container
+
 const MobileSearchContainer = styled.form`
     display: flex;
     background-color: #333;
@@ -178,7 +178,7 @@ const MobileSearchContainer = styled.form`
     width: 250px;
     
     @media screen and (min-width: 768px) {
-        display: none; // Hide on larger screens
+        display: none;
     }
 `;
 
@@ -225,14 +225,14 @@ export default function Header() {
     function closeMobileNav() {
         setMobileNavActive(false);
     }
-      // Initial fetch on session change
+        // initial fetch on session change
     useEffect(() => {
         if (session) {
             fetchNotificationsCount();
         }
     }, [session]);
 
-      // Fetch on page navigation
+      // fetch on page navigation
     useEffect(() => {
         if (session && router.asPath === '/notifications') {
             fetchNotificationsCount();
